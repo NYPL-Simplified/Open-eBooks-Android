@@ -15,22 +15,55 @@ export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_NNN.jdk/Contents/Hom
 
 ## IntelliJ IDEA Prerequisites
 
-The latest version of IntelliJ IDEA is strongly recommended. Versions older than 2017.2.5 have not been tested.
-
 **NOTE:** Android Studio _will not work_ with this project due to a lack of Maven support.
+
+The latest version of IntelliJ IDEA is strongly recommended. Versions older than 2017.2.5 have not been tested.
 
 ## Nexus Setup
 
-Our application currently needs packages that are only available from our Nexus server in order to build correctly. (This will be changed in the future when non-DRM-enabled variants of the app are officially supported.) Nexus credentials can be obtained by emailing `nypl@winniequinn.com` or by asking in the `#simplified-android` channel of [librarysimplified.slack.com](https://librarysimplified.slack.com).
+**NOTE:** This section contains signing-related secrets that _must not_ be shared outside of NYPL.
 
-Once you have your credentials, the following lines must be added to `~/.gradle/gradle.properties`:
+Our application needs packages that are only available from our Nexus server in order to build correctly. Nexus credentials can be obtained by emailing `nypl@winniequinn.com` or by asking in the `#simplified-android` channel of [librarysimplified.slack.com](https://librarysimplified.slack.com).
 
-~~~
-# Replace USERNAME and PASSWORD appropriately.
-# Do NOT use quotes around either value.
-org.librarysimplified.nexus.username=USERNAME
-org.librarysimplified.nexus.password=PASSWORD
-~~~
+Once you have your credentials, the following should be placed at `~/.m2/settings.xml` with `USERNAME` and `PASSWORD` replaced appropriately:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<settings
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <servers>
+    <server>
+      <id>nypl-nexus-group</id>
+      <username>USERNAME</username>
+      <password>PASSWORD</password>
+    </server>
+  </servers>
+  <profiles>
+    <profile>
+      <id>nypl</id>
+      <properties>
+          <sign.keystore>nypl-keystore.jks</sign.keystore>
+          <sign.alias>nypl</sign.alias>
+          <sign.storepass><![CDATA[F3Sr&ECs+bqj&8QupRwHWYCd]]></sign.storepass>
+          <sign.keypass><![CDATA[UPf3cVM7Nj$Jt*=N73Mk653d]]></sign.keypass>
+      </properties>
+      <repositories>
+        <repository>
+          <id>nypl-nexus-group</id>
+          <name>NYPL nexus repo group</name>
+          <url>https://nexus.librarysimplified.org:8443/nexus/content/groups/external</url>
+          <layout>default</layout>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>nypl</activeProfile>
+  </activeProfiles>
+</settings>
+```
 
 ## Adobe Certificate Setup
 
