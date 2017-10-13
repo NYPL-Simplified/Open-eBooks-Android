@@ -31,15 +31,29 @@ Maven version 3.3.9 or newer is required. Versions older than 3.5.0 have not bee
 
 The latest version of the Android SDK tools is recommended. You can download them from [the Android developer site](https://developer.android.com/studio/index.html). Be sure to download only the command line tools and _not_ Android Studio. You must download these tools even if you already have Android Studio installed.
 
-After the tools have been downloaded and unpacked, you should add the following lines to your `.profile`, `.bash-profile`, or similar (replacing `PATH_TO_UNPACKED_ANDROID_TOOLS` appropriately):
+After the tools have been downloaded and unpacked, place the resulting `tools` directory _inside a new empty directory_ that will become your Android home directory. You should then add the following lines to your `.profile`, `.bash-profile`, or similar (replacing `ANDROID_HOME_PATH` appropriately with the path to the directory _containing_ the `tools` directory):
 
 ```
-export ANDROID_HOME=PATH_TO_UNPACKED_ANDROID_TOOLS
+export ANDROID_HOME=ANDROID_HOME_PATH
 export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
 export PATH="$PATH:$ANDROID_HOME/platform-tools/"
 ```
 
 After doing this, either open a new shell or use the `source` command to load your updated profile.
+
+## Android SDK Setup
+
+After the SDK tools have been installed, it is also necessary to install several SDK packages.
+
+One way to do this is by invoking `sdkmanager` directly via the following commands—be sure to enter them one at a time as some interactive portions for agreeing to licenses are present:
+
+```
+cd $ANDROID_HOME
+./tools/bin/sdkmanager --verbose 'platforms;android-21' ndk-bundle platform-tools tools 'extras;android;m2repository'
+./tools/bin/sdkmanager --verbose `./tools/bin/sdkmanager --list | grep build-tools | sort -r | head -n 1 | cut -d '|' -f 1 | tr -d ' '`
+```
+
+Alternatively, you can use the GUI provided by the IntelliJ Android plugin. It is recommended to use the above commands however as it is less error-phone than trying to tick all of the appropriate checkboxes.
 
 ## Nexus Setup
 
