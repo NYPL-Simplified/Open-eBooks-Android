@@ -27,7 +27,7 @@ Maven version 3.3.9 or newer is required. Versions older than 3.5.0 have not bee
 
  If you choose to download Maven directly from the Apache Maven Project, you will need to add the path to the `bin` directory containing `mvn` to your `PATH` environment variable. If you are unsure how to do this, ask a coworker.
 
-## Android SDK Setup
+## Android SDK Tools Prerequisites
 
 The latest version of the Android SDK tools is recommended. You can download them from [the Android developer site](https://developer.android.com/studio/index.html). Be sure to download only the command line tools and _not_ Android Studio. You must download these tools even if you already have Android Studio installed.
 
