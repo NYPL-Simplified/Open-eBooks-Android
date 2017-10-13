@@ -25,6 +25,20 @@ Maven version 3.3.9 or newer is required. Versions older than 3.5.0 have not bee
 
  The latest version can be obtained directly from [the Apache Maven Project's download page](https://maven.apache.org/download.cgi). You can also install Maven from MacPorts (via the `maven3` package) or Nixpkgs (via the `apache-maven` package). The Homebrew package is poorly maintained as of this writing and is not recommended.
 
+## Android SDK Setup
+
+The latest version of the Android SDK tools is recommended. You can download them from [the Android developer site](https://developer.android.com/studio/index.html). Be sure to download only the command line tools and _not_ Android Studio. You must download these tools even if you already have Android Studio installed.
+
+After the tools have been downloaded and unpacked, you should add the following lines to your `.profile`, `.bash-profile`, or similar (replacing `PATH_TO_UNPACKED_ANDROID_TOOLS` appropriately):
+
+```
+export ANDROID_HOME=PATH_TO_UNPACKED_ANDROID_TOOLS
+export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
+export PATH="$PATH:$ANDROID_HOME/platform-tools/"
+```
+
+After doing this, either open a new shell or use the `source` command to load your updated profile.
+
 ## Nexus Setup
 
 **NOTE:** This section contains signing-related secrets that _must not_ be shared outside of NYPL.
