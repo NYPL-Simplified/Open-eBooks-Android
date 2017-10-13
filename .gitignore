@@ -28,6 +28,7 @@ buildNumber.properties
 bin/
 gen/
 out/
+gen-external-apklibs/
 
 # Gradle files
 .gradle/
