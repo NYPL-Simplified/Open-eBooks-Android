@@ -21,7 +21,9 @@ The latest version of IntelliJ IDEA is strongly recommended. Versions older than
 
 ## Maven Prerequisites
 
-Maven version 3.5.0 or newer is required. The latest version can be obtained directly from [the Apache Maven Project's download page](https://maven.apache.org/download.cgi). You can also install Maven from MacPorts (via the `maven3` package) or Nixpkgs (via the `apache-maven` package). The Homebrew package is poorly maintained as of this writing and is not recommended.
+Maven version 3.3.9 or newer is required. Versions older than 3.5.0 have not been recently tested.
+
+ The latest version can be obtained directly from [the Apache Maven Project's download page](https://maven.apache.org/download.cgi). You can also install Maven from MacPorts (via the `maven3` package) or Nixpkgs (via the `apache-maven` package). The Homebrew package is poorly maintained as of this writing and is not recommended.
 
 ## Nexus Setup
 
