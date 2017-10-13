@@ -1,125 +1,86 @@
-Simplified
-==========
+# Build Setup
 
-## Building
+## Java Prerequisites
 
-First, deploy the Android SDK artifacts to a repository using
-the following tool from Simpligility:
+1. You should have Java SE 8u101 or [a newer version of Java SE 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) installed. (Java SE 7u111 and newer versions of Java SE 7 may also work but have not been tested.) This is because older versions of Java do not trust [Let's Encrypt](https://letsencrypt.org/) which provides our SSL certificate.
 
-  https://github.com/simpligility/maven-android-sdk-deployer
+2. The `JAVA_HOME` environment variable must be set correctly. You can check what it is set to in most shells with `echo $JAVA_HOME`. If that command does not show anything, adding the following line to `~/.profile` (assuming you are on macOS) and then executing `source ~/.profile` or opening a new shell should suffice:
 
-Once the Android artifacts are deployed, and your copy of Maven
-knows how to find the repository in which they were deployed, it's
-necessary to set `$ANDROID_HOME` to the location of the Android SDK
-tools. For example, if the SDK is at `${HOME}/local/android-sdk-linux`,
-then:
+~~~w
+# Replace NNN with your particular version of 1.8.0.
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_NNN.jdk/Contents/Home
+~~~
 
-```
-$ export ANDROID_HOME=${HOME}/local/android-sdk-linux
-```
+3. You can verify that everything is set up correctly by inspecting the results of both `java -version` and `javac -version`.
 
-Then, simply run:
+## Android Studio Prerequisites
 
-```
-$ mvn clean package
-```
+The latest version of Android Studio is strongly recommended. Versions older than 2.3.3 have not been tested.
 
-### DRM (NYPL and licensees only!)
+## Nexus Setup
 
-If the application is to be built with support for Adobe DRM, the
-the Adobe-provided `ReaderClientCert.sig` files must be placed in
-`src/main/assets` for each of the current application frontends.
-The build will check for the existence of these files and fail if
-they do not exist. Additionally, the NYPL Adobe DRM package(s) must
-be deployed to a local repository.
+Our application currently needs packages that are only available from our Nexus server in order to build correctly. (This will be changed in the future when non-DRM-enabled variants of the app are officially supported.) Nexus credentials can be obtained by emailing `nypl@winniequinn.com` or by asking in the `#simplified-android` channel of [librarysimplified.slack.com](https://librarysimplified.slack.com).
 
-Once this is done, building the package with Adobe DRM support
-enabled is achieved by:
+Once you have your credentials, the following lines must be added to `~/.gradle/gradle.properties`:
 
-```
-$ mvn -P nypl-drm-adobe clean package
-```
+~~~
+# Replace USERNAME and PASSWORD appropriately.
+# Do NOT use quotes around either value.
+org.librarysimplified.nexus.username=USERNAME
+org.librarysimplified.nexus.password=PASSWORD
+~~~
 
-## HelpStack
+## Adobe Certificate Setup
 
-If HelpStack is to be used, a configuration file must be provided
-in the `assets` directory of the application being built. So, to
-enable Zendesk for the `SimplyE` application, create a file at
-`simplified-app-simplye/src/main/assets/helpstack.conf` with the
-correct URL and credentials:
+The correct certificate file must be placed at `simplified-app-simplye/src/main/assets/ReaderClientCert.sig` in order for Adobe DRM to work. The app will function correctly without this file so long as only non-DRM-protected books are opened.
+
+## HelpStack Setup
+
+**NOTE:** Care should always be taken to ensure HelpStack is functioning correctly after making any configuration changes. Configuration errors or a lack of configuration may result in errors that only appear at runtime.
+
+If HelpStack is to be used, a configuration file must be placed at `simplified-app-simplye/src/main/assets/helpstack.conf`.
+
+For Zendesk, you should use the following configuration:
 
 ```
-helpstack.gear                 = zendesk
-helpstack.zendesk.instance_url = https://nonexistent.zendesk.com
-helpstack.zendesk.staff_email  = nobody@example.com
-helpstack.zendesk.api_token    = bmljZSBjYXRjaAo=
+helpstack.gear = zendesk
+helpstack.zendesk.instance_url = ...
+helpstack.zendesk.staff_email = ...
+helpstack.zendesk.api_token = ...
 ```
+
+For Salesforce Desk, use the following instead:
+
+```
+helpstack.gear = desk
+helpstack.desk.instance_url = ...
+helpstack.desk.to_help_email = ...
+helpstack.desk.staff_login_email = ...
+helpstack.desk.staff_login_password =  ...
+```
+
+## Generating Signed APKs
+
+If you wish to generate a signed APK for publishing the application, you will need to set the following values correctly in `~/.gradle/gradle.properties`:
+
+~~~
+org.librarysimplified.simplye.keyAlias=
+org.librarysimplified.simplye.keyPassword=
+org.librarysimplified.simplye.storePassword=
+~~~
+
+In addition, you will need to obtain the correct Java keystore and either place it in the project at `simplified-app-simplye/keystore.jks` or create a symbolic link at the same location appropriately. All files matching `*.jks` are set to be ignored by Git, but care should always be taken to ensure keystores and other secrets are never committed regardless.
+
+Once the above has been completed, executing `./gradlew assembleRelease` will generate the signed APK and place it at `./simplified-app-simplye/build/outputs/apk/simplified-app-simplye-release.apk`.
 
 ## Branding And Configurable Features
 
 See [simplified-app-shared/README-Branding.md](simplified-app-shared/README-Branding.md)
-for documentation on how to produce your own branded and configured
-application.
+for documentation on how to customize branding of the application.
 
-## Development
+# Building
 
-This project is developed using the
-[git-flow](http://nvie.com/posts/a-successful-git-branching-model/)
-branching model.
+**NOTE:** Due to an unknown issue, you must execute `./gradlew assembleDebug` one time before opening the project in Android Studio. This will pull in all dependencies that, for whatever reason, are not fetched if Gradle is executed via Android Studio.
 
-The [gitflow AVH edition](https://github.com/petervanderdoes/gitflow/)
-tool is used to facilitate this. The `master` branch represents the
-current production-ready code, and development occurs on the `develop`
-branch. All commits and tags are PGP-signed for stronger assurances
-of authenticity.
+After setup is complete, the project can be opened in Android Studio and built as normal.
 
-## License
-
-```
-© 2015 The New York Public Library, Astor, Lenox, and Tilden Foundations
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
-or implied. See the License for the specific language governing
-permissions and limitations under the License.
-```
-
-This product includes code derived from the [Readium Android SDK
-Launcher](https://github.com/readium/SDKLauncher-Android), which
-is distributed under the following license:
-
-```
-Copyright (c) 2014 Readium Foundation and/or its licensees. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, this
-list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.
-
-3. Neither the name of the organization nor the names of its contributors may be
-used to endorse or promote products derived from this software without specific
-prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-OF THE POSSIBILITY OF SUCH DAMAGE
-```
