@@ -19,6 +19,10 @@ export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_NNN.jdk/Contents/Hom
 
 The latest version of IntelliJ IDEA is strongly recommended. Versions older than 2017.2.5 have not been tested.
 
+## Maven Prerequisites
+
+Maven version 3.5.0 or newer is required. The latest version can be obtained directly from [the Apache Maven Project's download page](https://maven.apache.org/download.cgi). You can also install Maven from MacPorts (via the `maven3` package) or Nixpkgs (via the `apache-maven` package). The Homebrew package is poorly maintained as of this writing and is not recommended.
+
 ## Nexus Setup
 
 **NOTE:** This section contains signing-related secrets that _must not_ be shared outside of NYPL.
