@@ -73,7 +73,9 @@ https://github.com/NYPL-Simplified/Certificates/raw/master/APK%20Signing/nypl-ke
 
 ## Adobe Certificate Setup
 
-The correct certificate file must be placed at `simplified-app-simplye/src/main/assets/ReaderClientCert.sig` in order for Adobe DRM to work. The app will function correctly without this file so long as only non-DRM-protected books are opened.
+In order for Adobe DRM to work, the correct certificate file must be bundled into the app. Download it from the following URL while logged into GitHub in your browser and then place it at `simplified-app-openebooks/src/main/assets/ReaderClientCert.sig`:
+
+https://github.com/NYPL-Simplified/Certificates/raw/master/OpenEbooks/Android/ReaderClientCert.sig
 
 ## HelpStack Setup
 
