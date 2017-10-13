@@ -65,6 +65,12 @@ Once you have your credentials, the following should be placed at `~/.m2/setting
 </settings>
 ```
 
+## Keystore Setup
+
+In order to sign APKs, a Java keystore is required. Download it from the following URL while logged into GitHub in your browser and then place it at `~/.m2/nypl-keystore.jks`:
+
+https://github.com/NYPL-Simplified/Certificates/raw/master/APK%20Signing/nypl-keystore.jks
+
 ## Adobe Certificate Setup
 
 The correct certificate file must be placed at `simplified-app-simplye/src/main/assets/ReaderClientCert.sig` in order for Adobe DRM to work. The app will function correctly without this file so long as only non-DRM-protected books are opened.
