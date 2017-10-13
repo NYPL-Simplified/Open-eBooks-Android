@@ -13,9 +13,11 @@ export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_NNN.jdk/Contents/Hom
 
 3. You can verify that everything is set up correctly by inspecting the results of both `java -version` and `javac -version`.
 
-## Android Studio Prerequisites
+## IntelliJ IDEA Prerequisites
 
-The latest version of Android Studio is strongly recommended. Versions older than 2.3.3 have not been tested.
+The latest version of IntelliJ IDEA is strongly recommended. Versions older than 2017.2.5 have not been tested.
+
+**NOTE:** Android Studio _will not work_ with this project due to a lack of Maven support.
 
 ## Nexus Setup
 
