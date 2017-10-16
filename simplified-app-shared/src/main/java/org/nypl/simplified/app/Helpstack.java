@@ -145,34 +145,23 @@ public final class Helpstack implements HelpstackType
   }
 
   private static HSDeskGear getDeskGear(final Properties p)
-          throws HelpstackConfigurationMissingParameter
+      throws HelpstackConfigurationMissingParameter
   {
     final HSGear zg;
     final String instance_url = p.getProperty("helpstack.desk.instance_url");
     if (instance_url == null) {
       throw new HelpstackConfigurationMissingParameter(
-              "helpstack.desk.instance_url");
+          "helpstack.desk.instance_url");
     }
 
-    final String to_help_email = p.getProperty("helpstack.desk.to_help_email");
-    if (to_help_email == null) {
+    final String token = p.getProperty("helpstack.desk.token");
+    if (token == null) {
       throw new HelpstackConfigurationMissingParameter(
-              "helpstack.desk.to_help_email");
+          "helpstack.desk.token");
     }
 
-    final String staff_login_email = p.getProperty("helpstack.desk.staff_login_email");
-    if (staff_login_email == null) {
-      throw new HelpstackConfigurationMissingParameter(
-              "helpstack.desk.staff_login_email");
-    }
-
-    final String staff_login_password = p.getProperty("helpstack.desk.staff_login_password");
-    if (staff_login_password == null) {
-      throw new HelpstackConfigurationMissingParameter(
-              "helpstack.desk.staff_login_password");
-    }
-
-    return new HSDeskGear(instance_url, to_help_email, staff_login_email, staff_login_password);
+    final String brand_id = p.getProperty("helpstack.desk.brand_id");
+    return new HSDeskGear(instance_url, token, brand_id);
   }
 
   @Override public void show(final Activity a)

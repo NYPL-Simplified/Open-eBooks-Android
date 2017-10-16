@@ -16,6 +16,7 @@ import org.nypl.drm.core.AdobeAdeptFulfillmentToken;
 import org.nypl.drm.core.AdobeAdeptLoan;
 import org.nypl.drm.core.AdobeAdeptNetProviderType;
 import org.nypl.drm.core.AdobeAdeptProcedureType;
+import org.nypl.drm.core.AdobeUserID;
 import org.nypl.drm.core.DRMUnsupportedException;
 import org.nypl.simplified.assertions.Assertions;
 import org.nypl.simplified.downloader.core.DownloadListenerType;
@@ -269,7 +270,10 @@ final class BooksControllerBorrowTask implements Runnable
               }
             });
 
-          c.fulfillACSM(new AdobeFulfillmentListener(), acsm);
+          final AdobeUserID user = ((Some<AdobeUserID>)
+              BooksControllerBorrowTask.this.getAccountCredentials().getAdobeUserID()).get();
+
+          c.fulfillACSM(new AdobeFulfillmentListener(), acsm, user);
         }
       });
   }
