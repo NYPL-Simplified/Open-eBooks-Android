@@ -32,13 +32,13 @@ org.librarysimplified.nexus.password=PASSWORD
 
 ## Adobe Certificate Setup
 
-The correct certificate file must be placed at `simplified-app-simplye/src/main/assets/ReaderClientCert.sig` in order for Adobe DRM to work. The app will function correctly without this file so long as only non-DRM-protected books are opened.
+The correct certificate file must be placed at `simplified-app-openebooks/src/main/assets/ReaderClientCert.sig` in order for Adobe DRM to work. The app will function correctly without this file so long as only non-DRM-protected books are opened.
 
 ## HelpStack Setup
 
 **NOTE:** Care should always be taken to ensure HelpStack is functioning correctly after making any configuration changes. Configuration errors or a lack of configuration may result in errors that only appear at runtime.
 
-If HelpStack is to be used, a configuration file must be placed at `simplified-app-simplye/src/main/assets/helpstack.conf`.
+If HelpStack is to be used, a configuration file must be placed at `simplified-app-openebooks/src/main/assets/helpstack.conf`.
 
 For Zendesk, you should use the following configuration:
 
@@ -64,14 +64,14 @@ helpstack.desk.staff_login_password =  ...
 If you wish to generate a signed APK for publishing the application, you will need to set the following values correctly in `~/.gradle/gradle.properties`:
 
 ~~~
-org.librarysimplified.simplye.keyAlias=
-org.librarysimplified.simplye.keyPassword=
-org.librarysimplified.simplye.storePassword=
+org.librarysimplified.openebooks.keyAlias=
+org.librarysimplified.openebooks.keyPassword=
+org.librarysimplified.openebooks.storePassword=
 ~~~
 
-In addition, you will need to obtain the correct Java keystore and either place it in the project at `simplified-app-simplye/keystore.jks` or create a symbolic link at the same location appropriately. All files matching `*.jks` are set to be ignored by Git, but care should always be taken to ensure keystores and other secrets are never committed regardless.
+In addition, you will need to obtain the correct Java keystore and either place it in the project at `simplified-app-openebooks/keystore.jks` or create a symbolic link at the same location appropriately. All files matching `*.jks` are set to be ignored by Git, but care should always be taken to ensure keystores and other secrets are never committed regardless.
 
-Once the above has been completed, executing `./gradlew assembleRelease` will generate the signed APK and place it at `./simplified-app-simplye/build/outputs/apk/simplified-app-simplye-release.apk`.
+Once the above has been completed, executing `./gradlew assembleRelease` will generate the signed APK and place it at `./simplified-app-openebooks/build/outputs/apk/simplified-app-simplye-release.apk`.
 
 ## Branding And Configurable Features
 
