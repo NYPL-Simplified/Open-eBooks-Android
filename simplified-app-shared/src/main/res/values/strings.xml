@@ -143,6 +143,8 @@
   <string name="login_needed">You need to login to access the collection.</string>
   <string name="login_with_barcode">Login with Barcode</string>
   <string name="login_with_clever">Login with Clever</string>
+  <string name="login_clever_instruction_label">Log in with Chrome to continue.</string>
+  <string name="login_clever_signingin_label">Logging in. Please wait.</string>
   <string name="request_new_codes">Request New Code</string>
 
   <string name="navigation_accessibility">Navigation</string>

@@ -10,10 +10,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import com.io7m.jfunctional.Option;
 import com.io7m.jfunctional.OptionType;
@@ -44,8 +46,9 @@ import java.net.URLDecoder;
 import java.util.StringTokenizer;
 
 /**
- * A mindlessly simple activity that displays a given URI in a full-screen web
- * view.
+ * A moderately simple activity that sends the user to authorize in an external browser then
+ * returns to the app and parses the URL to sign in with the received credentials. The old way of
+ * using an in-app webview had to be deprecated based on a change to Google's security policy.
  */
 
 public final class CleverLoginActivity extends SimplifiedActivity implements AccountLoginListenerType {
@@ -55,8 +58,6 @@ public final class CleverLoginActivity extends SimplifiedActivity implements Acc
   static {
     LOG = LogUtilities.getLog(CleverLoginActivity.class);
   }
-
-  private WebView web_view;
 
   private
   @Nullable
@@ -69,7 +70,6 @@ public final class CleverLoginActivity extends SimplifiedActivity implements Acc
   public CleverLoginActivity() {
 
   }
-
 
   @Override
   public boolean onOptionsItemSelected(
@@ -87,7 +87,6 @@ public final class CleverLoginActivity extends SimplifiedActivity implements Acc
       }
     }
   }
-
 
   @Override protected SimplifiedPart navigationDrawerGetPart()
   {
@@ -113,161 +112,9 @@ public final class CleverLoginActivity extends SimplifiedActivity implements Acc
       rr.getString(
         R.string.feature_auth_provider_clever_uri));
 
-
     setTitle(title);
     CleverLoginActivity.LOG.debug("title: {}", title);
     CleverLoginActivity.LOG.debug("uri: {}", uri);
-
-
-    this.web_view =
-      NullCheck.notNull((WebView) this.findViewById(R.id.web_view));
-
-
-    this.web_view.getSettings().setJavaScriptEnabled(true);
-
-
-    this.web_view.setWebViewClient(new WebViewClient() {
-
-
-      @Override
-      public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
-        if (url.startsWith("open-ebooks-clever")) {
-          // Parse the token fom the URL and close the webview
-
-          return true;
-        } else {
-          return super.shouldOverrideUrlLoading(view, url);
-        }
-      }
-
-
-      @Override
-      public void onPageFinished(final WebView view, final String url) {
-
-
-//        Intent intent = getIntent();
-//
-//        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-//          Uri data = intent.getData();
-//          // may be some test here with your custom uri
-//          String var = data.getQueryParameter("var"); // "str" is set
-//          String varr = data.getQueryParameter("varr"); // "string" is set
-//        }
-
-        if (url.startsWith("open-ebooks-clever")) {
-
-          final Uri uri = Uri.parse(url);
-          final String fragment = uri.getFragment();
-
-          final StringTokenizer stok = new StringTokenizer(fragment, "&");
-          String access_token = null;
-          String error = null;
-          String patron_info = null;
-
-          while (stok.hasMoreTokens()) {
-            final String token = stok.nextToken();
-            final StringTokenizer kvpair = new StringTokenizer(token, "=");
-
-            if (kvpair.hasMoreTokens()) {
-              final String key = kvpair.nextToken();
-              final String value = kvpair.nextToken();
-              if ("access_token".equalsIgnoreCase(key)) {
-                access_token = value;
-              } else if ("patron_info".equalsIgnoreCase(key)) {
-                try {
-                  patron_info = URLDecoder.decode(value, "UTF-8");
-
-                } catch (UnsupportedEncodingException e) {
-                  e.printStackTrace();
-                }
-              } else if ("error".equalsIgnoreCase(key)) {
-
-                try {
-                  error = URLDecoder.decode(value, "UTF-8");
-
-                  final HTTPProblemReport r = HTTPProblemReport.fromString(error);
-
-                  UIThread.runOnUIThread(
-                    new Runnable() {
-                      @Override
-                      public void run() {
-                        final AlertDialog.Builder b = new AlertDialog.Builder(CleverLoginActivity.this);
-                        b.setNeutralButton("Try Again", null);
-                        b.setMessage(r.getProblemDetail());
-                        b.setTitle(r.getProblemTitle());
-                        b.setCancelable(true);
-
-                        final AlertDialog a = b.create();
-                        a.setOnDismissListener(
-                          new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(
-                              final @Nullable DialogInterface d) {
-
-                            }
-                          });
-                        a.show();
-                      }
-                    });
-
-
-                } catch (UnsupportedEncodingException e) {
-                  e.printStackTrace();
-                } catch (IOException e) {
-                  e.printStackTrace();
-                }
-              }
-            }
-          }
-
-          if (error == null) {
-            final SimplifiedCatalogAppServicesType app =
-              Simplified.getCatalogAppServices();
-
-
-            final Resources rr = NullCheck.notNull(CleverLoginActivity.this.getResources());
-            final OptionType<AdobeVendorID> adobe_vendor = Option.some(
-              new AdobeVendorID(rr.getString(R.string.feature_adobe_vendor_id)));
-
-            final BooksType books = app.getBooks();
-
-            final AccountBarcode barcode = new AccountBarcode("");
-            final AccountPIN pin = new AccountPIN("");
-            final AccountAuthToken auth_token = new AccountAuthToken(NullCheck.notNull(access_token));
-            final AccountPatron patron = new AccountPatron(patron_info);
-            final AccountAdobeToken adobe_token = new AccountAdobeToken("");
-            final AccountAuthProvider auth_provider = new AccountAuthProvider("Clever");
-
-            final AccountCredentials creds =
-              new AccountCredentials(adobe_vendor, barcode, pin,  Option.some(auth_provider), Option.some(auth_token), Option.some(adobe_token), Option.some(patron));
-            creds.setAdobeDeviceID(Option.<AdobeDeviceID>none());
-            creds.setAdobeUserID(Option.<AdobeUserID>none());
-            books.accountLogin(creds, CleverLoginActivity.this);
-
-
-          } else {
-            //error display problem.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-              CookieManager.getInstance().removeAllCookies(null);
-              CookieManager.getInstance().flush();
-            } else {
-              final CookieSyncManager cookie_sync_manager = CookieSyncManager.createInstance(CleverLoginActivity.this);
-              cookie_sync_manager.startSync();
-              final CookieManager cookie_manager = CookieManager.getInstance();
-              cookie_manager.removeAllCookie();
-              cookie_manager.removeSessionCookie();
-              cookie_sync_manager.stopSync();
-              cookie_sync_manager.sync();
-            }
-            CleverLoginActivity.this.web_view.reload();
-          }
-        }
-      }
-    });
-
-    this.web_view.loadUrl(uri);
-
 
     final ActionBar bar = this.getActionBar();
     bar.setTitle(null);
@@ -283,7 +130,173 @@ public final class CleverLoginActivity extends SimplifiedActivity implements Acc
       bar.setHomeButtonEnabled(false);
     }
 
+    Intent intent = getIntent();
+    Uri openEbooksUri = intent.getData();
+    if (openEbooksUri == null || !openEbooksUri.toString().startsWith("open-ebooks-clever")) {
+      Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://circulation.openebooks.us/oauth_authenticate?provider=Clever&redirect_uri=open-ebooks-clever://oauth"));
+      startActivity(i);
+    } else {
+      handleRedirectUrl(openEbooksUri.toString());
+    }
+  }
 
+  //TODO just for testing
+  @Override
+  protected void onStop() {
+    super.onStop();
+
+  }
+
+  @Override
+  protected void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+
+
+    if (intent != null) {
+
+      this.setIntent(intent);
+
+      Uri openEbooksUri = intent.getData();
+      if (openEbooksUri != null) {
+        handleRedirectUrl(openEbooksUri.toString());
+      } else {
+        CleverLoginActivity.LOG.error("URI parsed from Intent was null.");
+      }
+    }
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    Intent intent = getIntent();
+    if (intent != null) {
+      Uri openEbooksUri = intent.getData();
+      if (openEbooksUri != null) {
+        handleRedirectUrl(openEbooksUri.toString());
+      } else {
+        CleverLoginActivity.LOG.error("URI parsed from passed Intent was null.");
+      }
+    }
+  }
+
+  public void handleRedirectUrl(final String urlString) {
+
+    if (urlString.startsWith("open-ebooks-clever") && (urlString.contains("error") || urlString.contains("access_token"))) {
+
+      final Uri uri = Uri.parse(urlString);
+      final String fragment = uri.getFragment();
+
+      final StringTokenizer stok = new StringTokenizer(fragment, "&");
+      String access_token = null;
+      String error = null;
+      String patron_info = null;
+
+      while (stok.hasMoreTokens()) {
+
+        final String token = stok.nextToken();
+        final StringTokenizer kvpair = new StringTokenizer(token, "=");
+
+        if (kvpair.hasMoreTokens()) {
+
+          final String key = kvpair.nextToken();
+          final String value = kvpair.nextToken();
+
+          if ("access_token".equalsIgnoreCase(key)) {
+            access_token = value;
+          } else if ("patron_info".equalsIgnoreCase(key)) {
+            try {
+              patron_info = URLDecoder.decode(value, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+              e.printStackTrace();
+            }
+          } else if ("error".equalsIgnoreCase(key)) {
+
+            try {
+              error = URLDecoder.decode(value, "UTF-8");
+
+              final HTTPProblemReport r = HTTPProblemReport.fromString(error);
+
+              UIThread.runOnUIThread(
+                  new Runnable() {
+                    @Override
+                    public void run() {
+                      final AlertDialog.Builder b = new AlertDialog.Builder(CleverLoginActivity.this);
+                      b.setNeutralButton("Try Again", null);
+                      b.setMessage(r.getProblemDetail());
+                      b.setTitle(r.getProblemTitle());
+                      b.setCancelable(true);
+
+                      final AlertDialog a = b.create();
+                      a.setOnDismissListener(
+                          new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(
+                                final @Nullable DialogInterface d) {
+                            }
+                          });
+                      a.show();
+                    }
+                  });
+            } catch (UnsupportedEncodingException e) {
+              e.printStackTrace();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+      }
+
+
+      //TODO Probably don't even need this. Would a user see it?
+      TextView descriptionLabel = (TextView)findViewById(R.id.login_clever_label);
+      descriptionLabel.setText(R.string.login_clever_signingin_label);
+
+      if (error == null) {
+        final SimplifiedCatalogAppServicesType app =
+            Simplified.getCatalogAppServices();
+
+        final Resources rr = NullCheck.notNull(CleverLoginActivity.this.getResources());
+        final OptionType<AdobeVendorID> adobe_vendor = Option.some(
+            new AdobeVendorID(rr.getString(R.string.feature_adobe_vendor_id)));
+
+        final BooksType books = app.getBooks();
+
+        final AccountBarcode barcode = new AccountBarcode("");
+        final AccountPIN pin = new AccountPIN("");
+        final AccountAuthToken auth_token = new AccountAuthToken(NullCheck.notNull(access_token));
+        final AccountPatron patron = new AccountPatron(patron_info);
+        final AccountAdobeToken adobe_token = new AccountAdobeToken("");
+        final AccountAuthProvider auth_provider = new AccountAuthProvider("Clever");
+
+        final AccountCredentials creds =
+            new AccountCredentials(adobe_vendor, barcode, pin,  Option.some(auth_provider), Option.some(auth_token), Option.some(adobe_token), Option.some(patron));
+        creds.setAdobeDeviceID(Option.<AdobeDeviceID>none());
+        creds.setAdobeUserID(Option.<AdobeUserID>none());
+        books.accountLogin(creds, CleverLoginActivity.this);
+
+
+      } else {
+        //error display problem.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+          CookieManager.getInstance().removeAllCookies(null);
+          CookieManager.getInstance().flush();
+        } else {
+          final CookieSyncManager cookie_sync_manager = CookieSyncManager.createInstance(CleverLoginActivity.this);
+          cookie_sync_manager.startSync();
+          final CookieManager cookie_manager = CookieManager.getInstance();
+          cookie_manager.removeAllCookie();
+          cookie_manager.removeSessionCookie();
+          cookie_sync_manager.stopSync();
+          cookie_sync_manager.sync();
+        }
+
+        //TODO hide or remove the description label. verify this works and makes sense.
+        descriptionLabel.setVisibility(View.INVISIBLE);
+
+      }
+    }
   }
 
 
@@ -362,22 +375,9 @@ public final class CleverLoginActivity extends SimplifiedActivity implements Acc
   public void onAccountLoginSuccess(
     final AccountCredentials creds) {
     CleverLoginActivity.LOG.debug("login succeeded");
-
-
     final Intent result = getIntent();
-//    result.putExtra("result", url);
     setResult(1, result);
     finish();
-
-
-//    final LoginListenerType ls = this.listener;
-//    if (ls != null) {
-//      try {
-//        ls.onLoginSuccess(creds);
-//      } catch (final Throwable e) {
-//        CleverLoginActivity.LOG.debug("{}", e.getMessage(), e);
-//      }
-//    }
   }
 
   @Override
@@ -387,8 +387,7 @@ public final class CleverLoginActivity extends SimplifiedActivity implements Acc
 
     final OptionType<Throwable> none = Option.none();
     this.onAccountLoginFailure(
-      none, CleverLoginActivity.getDeviceActivationErrorMessage(
-        this.getResources(), message));
+      none, CleverLoginActivity.getDeviceActivationErrorMessage(this.getResources(), message));
   }
 
   private void onAccountLoginFailure(
