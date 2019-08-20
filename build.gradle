@@ -1,10 +1,11 @@
 buildscript {
   repositories {
+    google()
     jcenter()
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.3.3'
+    classpath 'com.android.tools.build:gradle:3.4.2'
     classpath 'com.netflix.nebula:gradle-lint-plugin:7.4.0'
     classpath 'com.nabilhachicha:android-native-dependencies:0.1.2'
   }
@@ -33,5 +34,7 @@ subprojects {
     }
     maven { url "http://repo.maven.apache.org/maven2" }
     maven { url "https://jitpack.io" }
+    google()
+    jcenter()
   }
 }
