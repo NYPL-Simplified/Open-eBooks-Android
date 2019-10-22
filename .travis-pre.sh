@@ -60,15 +60,10 @@ info "installing bugsnag configuration"
 cp -v ".travis/credentials/OpenEbooks/Android/bugsnag.conf" \
   simplified-app-openebooks/src/main/assets/bugsnag.conf
 
-info "installing cardcreator configuration"
-
-cp -v ".travis/credentials/OpenEbooks/Android/cardcreator.conf" \
-  simplified-app-openebooks/src/main/assets/cardcreator.conf
-
 info "installing keystore"
 
 cp -v ".travis/credentials/APK Signing/nypl-keystore.jks" \
-  app/keystore.jks
+  simplified-app-openebooks/keystore.jks
 
 #------------------------------------------------------------------------
 # Clone binaries repos
