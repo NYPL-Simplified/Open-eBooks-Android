@@ -1,11 +1,16 @@
 apply plugin: 'com.android.library'
 
-android {
-  compileSdkVersion 28
-  buildToolsVersion "28.0.3"
-}
-
 description = ''
+
+android {
+  compileSdkVersion androidCompileSDKVersion
+  buildToolsVersion androidBuildToolsVersion
+
+  defaultConfig {
+    minSdkVersion androidMinimumSDKVersion
+    targetSdkVersion androidTargetSDKVersion
+  }
+}
 
 dependencies {
   compile project(':simplified-json-core')

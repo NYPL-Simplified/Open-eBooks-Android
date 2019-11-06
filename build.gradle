@@ -5,10 +5,17 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.4.2'
+    classpath 'com.android.tools.build:gradle:3.5.2'
     classpath 'com.netflix.nebula:gradle-lint-plugin:7.4.0'
     classpath 'com.nabilhachicha:android-native-dependencies:0.1.2'
   }
+}
+
+ext {
+  androidBuildToolsVersion = "28.0.3"
+  androidCompileSDKVersion = 28
+  androidMinimumSDKVersion = 21
+  androidTargetSDKVersion = 28
 }
 
 allprojects {

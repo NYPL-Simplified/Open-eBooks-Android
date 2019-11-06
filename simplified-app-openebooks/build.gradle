@@ -57,7 +57,13 @@ android {
   lintOptions {
     checkReleaseBuilds false
   }
+
+  compileSdkVersion androidCompileSDKVersion
+  buildToolsVersion androidBuildToolsVersion
+
   defaultConfig {
+    minSdkVersion androidMinimumSDKVersion
+    targetSdkVersion androidTargetSDKVersion
     versionName = version.get(0)
     versionCode = version.get(1)
     setProperty("archivesBaseName", "openebooks-${versionName}-${versionCode}")
