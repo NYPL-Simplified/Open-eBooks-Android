@@ -16,7 +16,8 @@
     android:label="@string/feature_app_name"
     android:contentDescription="@string/feature_app_name"
     android:largeHeap="true"
-    android:theme="@style/SimplifiedTheme">
+    android:theme="@style/SimplifiedTheme"
+    android:usesCleartextTraffic="true">
 
     <!-- Main entry point for the application. -->
     <activity
