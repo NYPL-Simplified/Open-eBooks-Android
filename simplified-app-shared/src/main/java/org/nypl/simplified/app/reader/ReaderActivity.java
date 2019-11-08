@@ -479,18 +479,23 @@ public final class ReaderActivity extends Activity implements
 
     final View in_toc = NullCheck.notNull(this.view_toc);
 
-    in_toc.setOnClickListener(
-      new OnClickListener()
-      {
-        @Override public void onClick(
-          final @Nullable View v)
-        {
-          final ReaderTOC sent_toc = ReaderTOC.fromPackage(p);
-          ReaderTOCActivity.startActivityForResult(
-            ReaderActivity.this, sent_toc);
-          ReaderActivity.this.overridePendingTransition(0, 0);
-        }
-      });
+    UIThread.runOnUIThread(new Runnable() {
+      @Override
+      public void run() {
+        in_toc.setOnClickListener(
+            new OnClickListener()
+            {
+              @Override public void onClick(
+                  final @Nullable View v)
+              {
+                final ReaderTOC sent_toc = ReaderTOC.fromPackage(p);
+                ReaderTOCActivity.startActivityForResult(
+                    ReaderActivity.this, sent_toc);
+                ReaderActivity.this.overridePendingTransition(0, 0);
+              }
+            });
+      }
+    });
 
     /**
      * Get a reference to the web server. Start it if necessary (the callbacks
